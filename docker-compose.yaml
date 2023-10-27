@@ -24,7 +24,7 @@ services:
       database__connection__database: ghost
       database__connection__user: ghost
       database__connection__password: "${MYSQL_PASSWORD}"
-      url: www.example.com
+      url: haproxy.tech
       mail__transport: "${MAIL_TRANSPORT}"
       mail__options__host: "${MAIL_HOST}"
       mail__options__port: "${MAIL_PORT}"
