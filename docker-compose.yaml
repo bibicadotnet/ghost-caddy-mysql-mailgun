@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+
+  caddy:
+    image: caddy:2
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - $PWD/Caddyfile:/etc/caddy/Caddyfile
+      - caddy-data:/data
+    networks:
+      - docker-network
+
+  ghost:
+    image: ghost:5
+    restart: always
+    environment:
+      # see https://ghost.org/docs/config/#configuration-options
+      database__client: mysql
+      database__connection__host: db
+      database__connection__database: ghost
+      database__connection__user: ghost
+      database__connection__password: "${MYSQL_PASSWORD}"
+      url: www.example.com
+      mail__transport: "${MAIL_TRANSPORT}"
+      mail__options__host: "${MAIL_HOST}"
+      mail__options__port: "${MAIL_PORT}"
+      mail__options__secureConnection: "${MAIL_SECURE_CONNECTION}"
+      mail__options__auth__user: "${MAIL_USER}"
+      mail__options__auth__pass: "${MAIL_PASSWORD}"
+    volumes:
+      - ghost-data:/var/lib/ghost/content
+    links:
+      - db
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: ghost
+      MYSQL_USER: ghost
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+    cap_add:
+      - SYS_NICE
+    volumes:
+      - ghost-db:/var/lib/mysql
+
+volumes: 
+  ghost-data:
+  ghost-db:
+  caddy-data:
